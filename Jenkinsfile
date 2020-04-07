@@ -1,6 +1,7 @@
+#!/usr/bin/env groovy
 pipeline {
   agent any
-
+    // 可以设置环境变量
   tools {
     maven "apache-maven-3.6.3"
   }
@@ -10,17 +11,24 @@ pipeline {
       steps {
         git 'https://github.com/ajlanghorn/dvja.git'
         sh "mvn clean package"
+        echo 'This is the first step!'
+
       }
     }
+    // stage可以添加或减少
     stage('Check dependencies') {
       steps {
         dependencyCheck additionalArguments: '', odcInstallation: 'Dependency-Check'
         dependencyCheckPublisher pattern: ''
+       //dependencyCheckPublisher failedTotalCritical: 1, failedTotalHigh: 1, failedTotalLow: 10, failedTotalMedium: 5, pattern: '', unstableTotalCritical: 1, unstableTotalHigh: 1, unstableTotalLow: 10, unstableTotalMedium: 5
+       echo 'This is the second step!'
+
       }
     }
     stage('Scan for vulnerabilities') {
       steps {
-        sh 'java -jar /var/lib/jenkins/workspace/dvja/target/dvja-1.0-SNAPSHOT.war && zap-cli quick-scan --self-contained --spider -r http://127.0.0.1 && zap-cli report -o zap-report.html -f html'
+        sh 'java -jar dvja-*.war && zap-cli quick-scan --self-contained --spider -r http://127.0.0.1 && zap-cli report -o zap-report.html -f html'
+        echo 'This is the Third step!'
       }
     }
     stage('Analysis') {
