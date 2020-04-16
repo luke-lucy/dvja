@@ -1,3 +1,4 @@
+//luke  devsecops pipeline
 #!/usr/bin/env groovy
 pipeline {
   agent any
@@ -26,10 +27,11 @@ pipeline {
       }
     }
     stage('Scan for vulnerabilities') {
-      steps {
-        sh 'java -jar dvja-*.war && zap-cli quick-scan --self-contained --spider -r http://127.0.0.1 && zap-cli report -o zap-report.html -f html'
-        echo 'This is the Third step!'
-      }
+    steps {
+    sh 'zap-cli quick-scan --self-contained --spider -r http://127.0.0.1'
+    //sh 'java -jar dvja-*.war && zap-cli quick-scan --self-contained --spider -r http://127.0.0.1 && zap-cli report -o zap-report.html -f html'
+    echo 'This is the Third step!'
+       }
     }
     stage('Analysis') {
       steps {
@@ -47,14 +49,14 @@ pipeline {
       }
     }
   }
-  post {
-    always {
-      archiveArtifacts artifacts: 'zap-report.html', fingerprint: true
-      recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
-      recordIssues enabledForFailure: true, tool: checkStyle()
-      recordIssues enabledForFailure: true, tool: spotBugs()
-      recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
-      recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
-      }
-  }
+  //post {
+  //  always {
+  //    archiveArtifacts artifacts: 'zap-report.html', fingerprint: true
+  //    recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
+  //    recordIssues enabledForFailure: true, tool: checkStyle()
+  //    recordIssues enabledForFailure: true, tool: spotBugs()
+  //    recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
+  //    recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
+  //    }
+  //}
 }
